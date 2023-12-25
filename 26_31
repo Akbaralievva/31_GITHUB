@@ -1,0 +1,54 @@
+func isValidSudoku(_ board: [[Character]]) -> Bool {
+    var rows = Array(repeating: Set<Character>(), count: 9)
+    var columns = Array(repeating: Set<Character>(), count: 9)
+    var subgrids = Array(repeating: Set<Character>(), count: 9)
+
+    for i in 0..<9 {
+        for j in 0..<9 {
+            let currentChar = board[i][j]
+
+            // Check for rows
+            if currentChar != "." {
+                if rows[i].contains(currentChar) {
+                    return false
+                }
+                rows[i].insert(currentChar)
+            }
+
+            // Check for columns
+            if currentChar != "." {
+                if columns[j].contains(currentChar) {
+                    return false
+                }
+                columns[j].insert(currentChar)
+            }
+
+            // Check for subgrids
+            if currentChar != "." {
+                let subgridIndex = (i / 3) * 3 + (j / 3)
+                if subgrids[subgridIndex].contains(currentChar) {
+                    return false
+                }
+                subgrids[subgridIndex].insert(currentChar)
+            }
+        }
+    }
+
+    return true
+}
+
+// Example usage:
+let sudokuBoard: [[Character]] = [
+    ["5","3",".",".","7",".",".",".","."],
+    ["6",".",".","1","9","5",".",".","."],
+    [".","9","8",".",".",".",".","6","."],
+    ["8",".",".",".","6",".",".",".","3"],
+    ["4",".",".","8",".","3",".",".","1"],
+    ["7",".",".",".","2",".",".",".","6"],
+    [".","6",".",".",".",".","2","8","."],
+    [".",".",".","4","1","9",".",".","5"],
+    [".",".",".",".","8",".",".","7","9"]
+]
+
+let isValid = isValidSudoku(sudokuBoard)
+print("Is the Sudoku board valid? \(isValid)")

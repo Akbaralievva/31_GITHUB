@@ -1,0 +1,53 @@
+func kmpSearch(pattern: String, text: String) -> [Int] {
+    let patternLength = pattern.count
+    let textLength = text.count
+
+    // Build the prefix table (also known as the longest proper prefix array)
+    var prefixTable = [Int](repeating: 0, count: patternLength)
+    var j = 0
+
+    for i in 1..<patternLength {
+        while j > 0 && pattern[pattern.index(pattern.startIndex, offsetBy: i)] != pattern[pattern.index(pattern.startIndex, offsetBy: j)] {
+            j = prefixTable[j - 1]
+        }
+
+        if pattern[pattern.index(pattern.startIndex, offsetBy: i)] == pattern[pattern.index(pattern.startIndex, offsetBy: j)] {
+            j += 1
+        }
+
+        prefixTable[i] = j
+    }
+
+    // Perform the search using the prefix table
+    var matches = [Int]()
+    var i = 0
+    j = 0
+
+    while i < textLength {
+        if pattern[pattern.index(pattern.startIndex, offsetBy: j)] == text[text.index(text.startIndex, offsetBy: i)] {
+            i += 1
+            j += 1
+        }
+
+        if j == patternLength {
+            // Match found
+            matches.append(i - j)
+            j = prefixTable[j - 1]
+        } else if i < textLength && pattern[pattern.index(pattern.startIndex, offsetBy: j)] != text[text.index(text.startIndex, offsetBy: i)] {
+            if j != 0 {
+                j = prefixTable[j - 1]
+            } else {
+                i += 1
+            }
+        }
+    }
+
+    return matches
+}
+
+// Example usage:
+let pattern = "ABABC"
+let text = "ABABDABABCABABCABABC"
+
+let matches = kmpSearch(pattern: pattern, text: text)
+print("Matches found at indices: \(matches)")

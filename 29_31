@@ -1,0 +1,29 @@
+func isValidParentheses(_ s: String) -> Bool {
+    var stack = [Character]()
+
+    let pairs: [Character: Character] = [")": "(", "}": "{", "]": "["]
+
+    for char in s {
+        if let openingParen = pairs[char] {
+            // If the character is a closing parenthesis
+            if let top = stack.popLast(), top == openingParen {
+                continue
+            } else {
+                return false
+            }
+        } else {
+            // If the character is an opening parenthesis
+            stack.append(char)
+        }
+    }
+
+    // The string is valid if the stack is empty
+    return stack.isEmpty
+}
+
+// Example usage:
+let expression1 = "()[]{}"
+let expression2 = "([)]"
+
+print("Is '\(expression1)' valid?: \(isValidParentheses(expression1))")  // Output: true
+print("Is '\(expression2)' valid?: \(isValidParentheses(expression2))")  // Output: false

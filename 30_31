@@ -1,0 +1,146 @@
+import Foundation
+
+class Graph {
+    var adjacencyList: [Int: [(Int, Int)]] = [:]
+
+    func addEdge(_ from: Int, _ to: Int, _ weight: Int) {
+        if adjacencyList[from] == nil {
+            adjacencyList[from] = []
+        }
+        adjacencyList[from]?.append((to, weight))
+    }
+
+    func dijkstra(_ startNode: Int) -> [Int: Int] {
+        var distances: [Int: Int] = [:]
+        var priorityQueue = PriorityQueue<(Int, Int)>(ascending: true)
+
+        for node in adjacencyList.keys {
+            distances[node] = Int.max
+            priorityQueue.enqueue((node, Int.max))
+        }
+
+        distances[startNode] = 0
+        priorityQueue.decreasePriority(of: (startNode, 0), to: 0)
+
+        while let (currentNode, currentDistance) = priorityQueue.dequeue() {
+            if currentDistance > distances[currentNode]! {
+                continue
+            }
+
+            if let neighbors = adjacencyList[currentNode] {
+                for (neighbor, weight) in neighbors {
+                    let newDistance = currentDistance + weight
+                    if newDistance < distances[neighbor]! {
+                        distances[neighbor] = newDistance
+                        priorityQueue.decreasePriority(of: (neighbor, newDistance), to: newDistance)
+                    }
+                }
+            }
+        }
+
+        return distances
+    }
+}
+
+// Priority queue implementation for Dijkstra's algorithm
+struct PriorityQueue<T> {
+    private var elements: [T]
+    private let priorityFunction: (T, T) -> Bool
+
+    init(ascending: Bool, startingValues: [T] = [], priorityFunction: @escaping (T, T) -> Bool) {
+        if ascending {
+            self.priorityFunction = priorityFunction
+        } else {
+            self.priorityFunction = { !priorityFunction($0, $1) }
+        }
+        elements = []
+        for value in startingValues {
+            enqueue(value)
+        }
+    }
+
+    var isEmpty: Bool {
+        return elements.isEmpty
+    }
+
+    var count: Int {
+        return elements.count
+    }
+
+    func peek() -> T? {
+        return elements.first
+    }
+
+    mutating func enqueue(_ element: T) {
+        elements.append(element)
+        swim(elements.count - 1)
+    }
+
+    mutating func dequeue() -> T? {
+        guard !isEmpty else { return nil }
+        elements.swapAt(0, elements.count - 1)
+        let element = elements.removeLast()
+        sink(0)
+        return element
+    }
+
+    mutating func decreasePriority(of element: T, to priority: Int) {
+        if let index = elements.firstIndex(where: { $0 == element }) {
+            if priorityFunction(element, elements[index]) {
+                elements[index] = element
+                swim(index)
+            }
+        }
+    }
+
+    private mutating func swim(_ index: Int) {
+        var index = index
+        while index > 0 {
+            let parent = (index - 1) / 2
+            if priorityFunction(elements[index], elements[parent]) {
+                elements.swapAt(index, parent)
+                index = parent
+            } else {
+                break
+            }
+        }
+    }
+
+    private mutating func sink(_ index: Int) {
+        var index = index
+        while 2 * index + 1 < elements.count {
+            var child = 2 * index + 1
+            let rightChild = child + 1
+            if rightChild < elements.count && priorityFunction(elements[rightChild], elements[child]) {
+                child = rightChild
+            }
+            if priorityFunction(elements[child], elements[index]) {
+                elements.swapAt(index, child)
+                index = child
+            } else {
+                break
+            }
+        }
+    }
+}
+
+// Example usage:
+let graph = Graph()
+graph.addEdge(0, 1, 4)
+graph.addEdge(0, 7, 8)
+graph.addEdge(1, 2, 8)
+graph.addEdge(1, 7, 11)
+graph.addEdge(2, 3, 7)
+graph.addEdge(2, 8, 2)
+graph.addEdge(2, 5, 4)
+graph.addEdge(3, 4, 9)
+graph.addEdge(3, 5, 14)
+graph.addEdge(4, 5, 10)
+graph.addEdge(5, 6, 2)
+graph.addEdge(6, 7, 1)
+graph.addEdge(6, 8, 6)
+graph.addEdge(7, 8, 7)
+
+let startNode = 0
+let distances = graph.dijkstra(startNode)
+print("Shortest distances from node \(startNode): \(distances)")

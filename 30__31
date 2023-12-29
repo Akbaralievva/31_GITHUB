@@ -1,0 +1,49 @@
+class ListNode {
+    var val: Int
+    var next: ListNode?
+
+    init(_ val: Int) {
+        self.val = val
+        self.next = nil
+    }
+}
+
+func reverseLinkedList(_ head: ListNode?) -> ListNode? {
+    var current = head
+    var prev: ListNode? = nil
+    var next: ListNode? = nil
+
+    while current != nil {
+        next = current?.next
+        current?.next = prev
+        prev = current
+        current = next
+    }
+
+    return prev
+}
+
+// Example usage:
+let head = ListNode(1)
+head.next = ListNode(2)
+head.next?.next = ListNode(3)
+head.next?.next?.next = ListNode(4)
+head.next?.next?.next?.next = ListNode(5)
+
+print("Original linked list:")
+var current = head
+while current != nil {
+    print(current!.val, terminator: " -> ")
+    current = current?.next
+}
+print("nil")
+
+let reversedHead = reverseLinkedList(head)
+
+print("Reversed linked list:")
+var reversedCurrent = reversedHead
+while reversedCurrent != nil {
+    print(reversedCurrent!.val, terminator: " -> ")
+    reversedCurrent = reversedCurrent?.next
+}
+print("nil")

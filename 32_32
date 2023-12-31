@@ -1,0 +1,50 @@
+class TreeNode {
+    var value: Int
+    var left: TreeNode?
+    var right: TreeNode?
+
+    init(_ value: Int) {
+        self.value = value
+        self.left = nil
+        self.right = nil
+    }
+}
+
+func lowestCommonAncestor(_ root: TreeNode?, _ p: TreeNode?, _ q: TreeNode?) -> TreeNode? {
+    guard let root = root, let p = p, let q = q else {
+        return nil
+    }
+
+    if root === p || root === q {
+        return root
+    }
+
+    let left = lowestCommonAncestor(root.left, p, q)
+    let right = lowestCommonAncestor(root.right, p, q)
+
+    if left != nil && right != nil {
+        return root
+    }
+
+    return left ?? right
+}
+
+// Example usage:
+let root = TreeNode(3)
+root.left = TreeNode(5)
+root.right = TreeNode(1)
+root.left?.left = TreeNode(6)
+root.left?.right = TreeNode(2)
+root.right?.left = TreeNode(0)
+root.right?.right = TreeNode(8)
+root.left?.right?.left = TreeNode(7)
+root.left?.right?.right = TreeNode(4)
+
+let p = root.left
+let q = root.right
+
+if let commonAncestor = lowestCommonAncestor(root, p, q) {
+    print("Lowest Common Ancestor of \(p!.value) and \(q!.value): \(commonAncestor.value)")
+} else {
+    print("No common ancestor found.")
+}
